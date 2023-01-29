@@ -4,9 +4,18 @@ spring:
      url: "jdbc:postgresql://localhost:5433/library_management_system"
      username: "postgres"
      password: "root"
+     initialization-mode: always
+     initialize: true
+     continue-on-error: true
+
    jpa:
       show-sql: false
       properties:
         hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
         hibernate.format_sql: true
-        hibernate.ddl-auto: update
+      hibernate:
+        naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        ddl-auto: update
+        check_nullability: true
+server:
+  port : 8082
