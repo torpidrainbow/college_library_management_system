@@ -2,23 +2,24 @@ package com.librarymanagement.collegelibrarymanagementsystem.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @Entity
 @Table(name = "records")
-public class Record {
+public class Record implements Serializable {
     @Id
-    private Long id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userid")
+    private User userid;
 
-    private Long books_issued;
+    private Integer books_issued;
 
-    private Long books_reserved;
+    private Integer books_reserved;
 
-    private Long books_returned;
+    private Integer books_returned;
 
-    private Long fine_amount;
+    private Long calculate_fine;
 
 }

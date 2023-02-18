@@ -1,32 +1,57 @@
 package com.librarymanagement.collegelibrarymanagementsystem.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "users")
-public class User {
-//    public User(String name, String user_name, String password, User_Type type) {
-//        this.name = name;
-//        this.user_name = user_name;
-//        this.password = password;
-//        this.type = type;
-//    }
+public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue
+    private Long userid;
 
     private String name;
 
-    private String user_name;
+    private String username;
 
     private String password;
 
     @Enumerated(EnumType.STRING)
     private User_Type type;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookid")
+    private Book bookId;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "userid",cascade = CascadeType.ALL)
+    Record record;
+
+    @OneToMany(mappedBy = "bookid",cascade = CascadeType.ALL)
+    Set<Book> bookList = new HashSet<>();
+
+    @JsonIgnore
+    public Set<Book> getBookList() {
+        return bookList;
+    }
+
+    public void addBook(Book book) {
+        bookList.add(book);
+    }
+
+    public void removeBook(Book book) {
+        bookList.remove(book);
+    }
+
+
 
 }

@@ -23,15 +23,9 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> register(@Valid @RequestBody UserDto userDto) throws Exception {
+    public ResponseEntity<String> register(@RequestBody UserDto userDto) throws Exception {
         userService.register(userDto);
         return new ResponseEntity<>("user registered",HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<String> login(@Valid @RequestBody UserDto userDto) throws Exception {
-
-        userService.login(userDto.getUser_name(),userDto.pass());
-        return new ResponseEntity<>("user registered",HttpStatus.OK);
-    }
 }
