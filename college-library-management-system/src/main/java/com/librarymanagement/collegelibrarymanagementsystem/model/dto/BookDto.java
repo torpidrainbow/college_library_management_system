@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class BookDto {
 
+    private Long bookid;
+
     private String title;
 
     private String author;

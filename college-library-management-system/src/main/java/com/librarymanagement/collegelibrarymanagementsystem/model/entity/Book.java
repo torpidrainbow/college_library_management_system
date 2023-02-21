@@ -15,7 +15,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "books")
-public class Book implements Serializable {
+public class Book {
 
     @Id
     @GeneratedValue
@@ -24,9 +24,9 @@ public class Book implements Serializable {
 
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "userid")
-    private User userid;
+    private User borrower;
 
     private String author;
 
@@ -42,24 +42,31 @@ public class Book implements Serializable {
         return isAvailable;
     }
 
-    private LocalDateTime issue_date;
+    private Date issue_date;
 
-    private LocalDateTime return_date;
+    private Date due_date;
+
+    private Date return_date;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "userid",cascade = CascadeType.ALL)
-    Set<User> waitingList = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY)
+            @JoinTable(name = "book_waiting_list",
+    joinColumns = @JoinColumn(name = "bookId"),
+    inverseJoinColumns = @JoinColumn(name = "userId"))
+    List<User> waitingList;
 
     public void addUser(User user) {
         waitingList.add(user);
     }
 
-    public void removeUser(User user) {
-        waitingList.remove(user);
+    public void removeUser() {
+
+        waitingList.remove(0);
     }
 
-    public Set<User> getWaitingList() {
+    public List<User> getWaitingList() {
         return waitingList;
     }
+
 
 }

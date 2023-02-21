@@ -11,6 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +24,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/book")
+@PreAuthorize("isAuthenticated()")
 public class BookController {
 
     @Autowired
@@ -33,19 +39,33 @@ public class BookController {
         return new ResponseEntity<>(bookService.findAllBooks(), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<String> addBook(@RequestParam Long userId, @RequestBody BookDto bookDto) throws Exception {
-
-        return new ResponseEntity<>(bookService.addBook(userId,bookDto),HttpStatus.OK);
+    @PostMapping("/addBook")
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    public ResponseEntity<String> addBook(@RequestBody BookDto bookDto,@AuthenticationPrincipal UserDetails userDetails) throws Exception {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth.isAuthenticated()) {
+            return new ResponseEntity<>(bookService.addBook(userDetails.getUsername(),bookDto),HttpStatus.OK);
+//        }
+//
+//        else{
+//            return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+//        }
     }
 
-    @DeleteMapping("/{userId}/removebook/{bookId}")
-    public ResponseEntity<String> removeBook(@PathVariable Long userId,@PathVariable Long bookId) throws Exception {
-        return new ResponseEntity<>(bookService.removeBook(userId,bookId), HttpStatus.OK);
+    @DeleteMapping("/removeBook")
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    public ResponseEntity<String> removeBook(@AuthenticationPrincipal UserDetails userDetails,@RequestParam Long bookId) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.isAuthenticated()) {
+            return new ResponseEntity<>(bookService.removeBook(userDetails.getUsername(), bookId), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/title")
-    public ResponseEntity<List<Book>> searchBooksByTitle(@RequestParam String title) throws Exception {
+    public ResponseEntity<List<BookDto>> searchBooksByTitle(@RequestParam String title) throws Exception {
         return new ResponseEntity<>(bookService.searchBooksByTitle(title), HttpStatus.OK);
     }
 
@@ -65,20 +85,31 @@ public class BookController {
             return (bookService.searchBooksByCategory(category));
     }
 
-    @PutMapping("/{userId}/issue/{bookId}")
-    public ResponseEntity<String> issueBook(@PathVariable(name = "userId") Long userId,
-                                               @PathVariable(name = "bookId") Long bookId) throws Exception {
-        return new ResponseEntity<>(bookService.issueBook(userId, bookId),HttpStatus.OK);
+    @PutMapping("/borrow")
+    public ResponseEntity<String> borrowBook(@AuthenticationPrincipal UserDetails userDetails,
+                                               @RequestParam Long bookId) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.isAuthenticated()) {
+            return new ResponseEntity<>(bookService.issueBook(userDetails.getUsername(), bookId), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
 
     }
 
     @PutMapping("/{userId}/return/{bookId}")
-    public ResponseEntity<String> returnBook(@PathVariable(name = "userId") Long userId,
-                                            @PathVariable(name = "bookId") Long bookId) throws Exception {
-        return new ResponseEntity<>(bookService.returnBook(userId, bookId),HttpStatus.OK);
-
+    public ResponseEntity<String> returnBook(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestParam Long bookId) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.isAuthenticated()) {
+            return new ResponseEntity<>(bookService.returnBook(userDetails.getUsername(), bookId), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
     }
-    }
+}
 
 
 

@@ -12,11 +12,11 @@ public interface BookService {
 
     List<Book> findAllBooks();
 
-    public String addBook(Long userId,BookDto book) throws Exception;
+    public String addBook(String username,BookDto book) throws Exception;
 
-    public String removeBook(Long userId,Long bookId) throws Exception;
+    public String removeBook(String username,Long bookId) throws Exception;
 
-    public List<Book> searchBooksByTitle(String title) throws Exception;
+    public List<BookDto> searchBooksByTitle(String title) throws Exception;
 
     public List<Book> searchBooksByPublication(String publication);
 
@@ -26,9 +26,9 @@ public interface BookService {
 
     //public void reserveBook(BookDto book) throws Exception;
 
-    public String issueBook(Long userId, Long bookId) throws Exception;
+    public String issueBook(String username, Long bookId) throws Exception;
 
-    String returnBook(Long userId, Long bookId) throws JsonProcessingException , LibraryException;
+    String returnBook(String username, Long bookId) throws JsonProcessingException , LibraryException;
 
-    String reserveBook(Long userId, Long bookId) throws Exception;
+    String reserveBook(String username, Long bookId) throws Exception;
 }
