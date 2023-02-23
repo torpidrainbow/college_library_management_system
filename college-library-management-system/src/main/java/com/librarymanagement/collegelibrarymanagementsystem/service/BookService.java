@@ -18,11 +18,11 @@ public interface BookService {
 
     public List<BookDto> searchBooksByTitle(String title) throws Exception;
 
-    public List<Book> searchBooksByPublication(String publication);
+    public List<BookDto> searchBooksByPublication(String publication);
 
-    public List<Book> searchBooksByAuthor(String author) throws Exception;
+    public List<BookDto> searchBooksByAuthor(String author) throws Exception;
 
-    List<Book> searchBooksByCategory(String category);
+    List<BookDto> searchBooksByCategory(String category);
 
     //public void reserveBook(BookDto book) throws Exception;
 
@@ -31,4 +31,8 @@ public interface BookService {
     String returnBook(String username, Long bookId) throws JsonProcessingException , LibraryException;
 
     String reserveBook(String username, Long bookId) throws Exception;
+
+    String renewBook(String username, Long bookId) throws Exception;
+
+    List<Book> findOverdueBooks();
 }

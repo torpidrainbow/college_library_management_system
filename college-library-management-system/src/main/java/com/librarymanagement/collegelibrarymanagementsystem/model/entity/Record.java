@@ -23,6 +23,6 @@ public class Record{
 
     private Integer books_returned=0;
 
-    private double calculate_fine=0;
+    private double fine_amount=0;
 
 }

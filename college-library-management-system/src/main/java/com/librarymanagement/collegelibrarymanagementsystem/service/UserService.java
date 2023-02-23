@@ -10,5 +10,7 @@ public interface UserService {
 
     public void register(UserDto userDto) throws Exception;
 
-    User authenticate(String username, String password);
+    //User authenticate(String username, String password);
+
+    public String deactivateUser(String username, Long userId) throws Exception;
 }

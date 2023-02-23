@@ -10,6 +10,56 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class User{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userid;
+
+    private String name;
+
+    private String username;
+
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private User_Type type;
+
+
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    Record record;
+
+    @OneToMany(mappedBy = "borrower",fetch = FetchType.LAZY)
+    List<Book> bookList;
+
+    public int getTime_period() {
+        return time_period;
+    }
+
+    public void setTime_period(int time_period) {
+        this.time_period = time_period;
+    }
+
+    private int time_period;
+
+    @JsonIgnore
+    public List<Book> getBookList() {
+        return bookList;
+    }
+
+    public void addBook(Book book) {
+        bookList.add(book);
+    }
+
+    public void removeBook(Book book) {
+        bookList.remove(book);
+    }
+
+    @Column(nullable=false)
+    private boolean isActive = Boolean.TRUE;
+
+    public boolean isActive(){
+        return isActive;
+    }
+
 
     public Long getUserid() {
         return userid;
@@ -17,6 +67,10 @@ public class User{
 
     public void setUserid(Long userid) {
         this.userid = userid;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public String getName() {
@@ -61,39 +115,6 @@ public class User{
 
     public void setBookList(List<Book> bookList) {
         this.bookList = bookList;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userid;
-
-    private String name;
-
-    private String username;
-
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    private User_Type type;
-
-
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-    Record record;
-
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
-    List<Book> bookList;
-
-    @JsonIgnore
-    public List<Book> getBookList() {
-        return bookList;
-    }
-
-    public void addBook(Book book) {
-        bookList.add(book);
-    }
-
-    public void removeBook(Book book) {
-        bookList.remove(book);
     }
 
 

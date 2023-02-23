@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,8 +48,7 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public List<Book> findAllBooks() {
-        List<Book> bookList = bookRepository.findAll();
-        return bookList;
+        return bookRepository.findAll();
     }
 
 
@@ -57,6 +58,9 @@ public class BookServiceImpl implements BookService{
             User user = userRepository.findByUsername(username);
             if(user==null){
                 throw new LibraryException("User not found");
+            }
+            if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
             }
             if (user.getType() == LIBRARIAN) {
                 Book bookEntity = new Book();
@@ -89,6 +93,9 @@ public class BookServiceImpl implements BookService{
             if(user==null){
                 throw new LibraryException("Invalid user");
             }
+            if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
+            }
             Book book = bookRepository.findById(bookId).orElse(null);
             if (book == null) {
                 throw new LibraryException("book not found");
@@ -110,24 +117,30 @@ public class BookServiceImpl implements BookService{
     @Override
     public List<BookDto> searchBooksByTitle(String title) throws Exception {
         List<Book> bookList = bookRepository.findByTitle(title);
+        if(bookList.isEmpty()){
+            throw new LibraryException("Cannot find book with this keyword");
+        }
 
-        return bookList.stream().map(e -> {
-            BookDto bookDto = mapper.map(e, BookDto.class);
-            return bookDto;
-        }).collect(Collectors.toList());
+        return bookList.stream().map(e -> mapper.map(e, BookDto.class)).collect(Collectors.toList());
     }
 
     @Override
-    public List<Book> searchBooksByPublication(String publication) {
+    public List<BookDto> searchBooksByPublication(String publication) {
         List<Book> bookList = bookRepository.findByPublication(publication);
-        return bookList;
+        if(bookList.isEmpty()){
+            throw new LibraryException("Cannot find book with this keyword");
+        }
+        return bookList.stream().map(e -> mapper.map(e, BookDto.class)).collect(Collectors.toList());
     }
 
     @Override
-    public List<Book>searchBooksByAuthor(String author) throws Exception {
+    public List<BookDto>searchBooksByAuthor(String author) throws Exception {
         try{
             List<Book> bookList = bookRepository.findByAuthor(author);
-            return bookList;
+            if(bookList.isEmpty()){
+                throw new LibraryException("Cannot find book with this keyword");
+            }
+            return bookList.stream().map(e -> mapper.map(e, BookDto.class)).collect(Collectors.toList());
         }
         catch (Exception e){
             throw new LibraryException("cannot find books with this author ");
@@ -136,17 +149,25 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public List<Book> searchBooksByCategory(String category){
-        return bookRepository.findByCategory(category);
+    public List<BookDto> searchBooksByCategory(String category){
+        List<Book> bookList = bookRepository.findByAuthor(category);
+
+        if(bookList.isEmpty()){
+            throw new LibraryException("Cannot find book with this keyword");
+        }
+        return bookList.stream().map(e -> mapper.map(e, BookDto.class)).collect(Collectors.toList());
     }
 
 
     @Override
-    public String issueBook(String username, Long bookId) throws LibraryException{
+    public String issueBook(String username, Long bookId) throws Exception{
         try {
             User user = userRepository.findByUsername(username);
             Book book = bookRepository.findById(bookId).orElseThrow(()-> new LibraryException("Book not found"));
 
+            if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
+            }
             Record record = user.getRecord();
             System.out.println(record.getBooks_issued());
 
@@ -157,22 +178,18 @@ public class BookServiceImpl implements BookService{
             if(user.getType()==STAFF && record.getBooks_issued() >= 6){
                 throw new LibraryException("Cannot issue more than 6 books");
             }
-
-
             if (!book.isAvailable()) {
                 throw new LibraryException("Book is not available");
             }
-
             if((user.getType()==STUDENT || user.getType()==LIBRARIAN) && book.getCategory()== Book_category.RESEARCH_PAPERS){
                 throw new LibraryException("Only staff can issue Research Papers");
             }
-
                 user.addBook(book);
                 user.getRecord().setBooks_issued(user.getRecord().getBooks_issued() + 1);
                 book.setAvailable(false);
                 book.setIssue_date(new Date());
+                book.setDueDate(addDays(new Date(),user.getTime_period()));
                 book.setBorrower(user);
-
 
                 bookRepository.save(book);
                 userRepository.save(user);
@@ -182,7 +199,6 @@ public class BookServiceImpl implements BookService{
         catch(LibraryException e){
             throw e;
         }catch (Exception e) {
-            e.printStackTrace();
             throw new LibraryException("Cannot issue book");
         }
 
@@ -193,34 +209,38 @@ public class BookServiceImpl implements BookService{
         try {
             User user = userRepository.findByUsername(username);
             System.out.println(user);
-            Book book = bookRepository.findById(bookId).orElse(null);
-            if (user == null || book == null) {
-                throw new LibraryException("Enter valid user and book details");
+            Book book = bookRepository.findById(bookId).orElseThrow(()->new LibraryException("Book not found"));
+
+            if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
             }
             if (book.isAvailable()) {
                 throw new LibraryException("Invalid book details");
             }
-
-            user.getRecord().setBooks_issued(user.getRecord().getBooks_issued() - 1);
-
-            book.setAvailable(true);
-            book.setReturn_date(new Date());
-            //TODO:add calculate fine here
-            user.removeBook(book);
-            bookRepository.save(book);
-            userRepository.save(user);
+            if((user).equals(book.getBorrower())) {
+                calculateFine(bookId);
+                user.getRecord().setFine_amount(user.getRecord().getFine_amount() + calculateFine(bookId));
+                user.getRecord().setBooks_issued(user.getRecord().getBooks_issued() - 1);
+                book.setAvailable(true);
+                book.setReturn_date(new Date());
+                book.setBorrower(null);
+                book.setIssue_date(null);
+                book.setDueDate(null);
+                //TODO:add calculate fine here
+                user.removeBook(book);
+                bookRepository.save(book);
+                userRepository.save(user);
+            }
             if(!book.getWaitingList().isEmpty()) {
                 issueBook(book.getWaitingList().stream().findFirst().get().getUsername(), bookId);
                 book.removeUser();
             }
-
             return "Book returned";
         }
         catch(LibraryException e){
             throw e;
         }
         catch (Exception e) {
-            e.printStackTrace();
             throw new LibraryException("Cannot issue book");
         }
     }
@@ -248,6 +268,55 @@ public class BookServiceImpl implements BookService{
         catch(Exception e){
             throw new LibraryException("Cannot reserve book");
         }
+    }
+
+    @Override
+    public String renewBook(String username,Long bookId) throws Exception {
+        try {
+            User user = userRepository.findByUsername(username);
+
+            Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
+            if (book.getBorrower() == null) {
+                throw new RuntimeException("Book is not currently borrowed");
+            }
+            if (book.getRenewalDate() != null) {
+                throw new RuntimeException("Book has already been renewed");
+            }
+            Date newDueDate = addDays(book.getDueDate(), user.getTime_period());
+            book.setDueDate(newDueDate);
+            book.setRenewalDate(new Date());
+            bookRepository.save(book);
+            return "Book renewed";
+        }
+        catch (LibraryException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new Exception("Cannot renew Book");
+        }
+    }
+
+    public int calculateFine(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
+        return Math.max(0, book.daysOverdue() * 5);
+    }
+
+    @Override
+    public List<Book> findOverdueBooks() {
+        List<Book> books = bookRepository.findAll();
+        List<Book> overdueBooks = new ArrayList<>();
+        for (Book book : books) {
+            if (book.daysOverdue() > 0) {
+                overdueBooks.add(book);
+            }
+        }
+        return overdueBooks;
+    }
+
+    private Date addDays(Date date, int days) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        localDate = localDate.plusDays(days);
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
 

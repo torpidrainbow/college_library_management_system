@@ -14,10 +14,10 @@ import java.util.Date;
 @ControllerAdvice
 public class LibraryManagementExceptionHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(LibraryException.class);
+    private Logger logger = LoggerFactory.getLogger(LibraryException.class);
 
     @ExceptionHandler(value = {LibraryException.class})
-    public ResponseEntity<Object> handlePipelineManagementServiceException(
+    public ResponseEntity<Object> handleLibraryException(
             LibraryException exp, WebRequest request) {
         String errorDescription = exp.getLocalizedMessage();
         if (errorDescription == null || errorDescription.isEmpty()) {

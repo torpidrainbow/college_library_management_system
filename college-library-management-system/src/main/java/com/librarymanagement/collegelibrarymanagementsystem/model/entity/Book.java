@@ -42,11 +42,26 @@ public class Book {
         return isAvailable;
     }
 
+    @Temporal(TemporalType.DATE)
     private Date issue_date;
 
-    private Date due_date;
+    @Temporal(TemporalType.DATE)
+    private Date dueDate;
 
+    @Temporal(TemporalType.DATE)
     private Date return_date;
+
+    public Date getRenewalDate() {
+        return renewalDate;
+    }
+
+    public void setRenewalDate(Date renewalDate) {
+        this.renewalDate = renewalDate;
+    }
+
+    private Date renewalDate;
+
+
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
@@ -68,5 +83,13 @@ public class Book {
         return waitingList;
     }
 
+    public int daysOverdue() {
+        Date currentDate = new Date();
+        if (currentDate.after(dueDate)) {
+            return (int) ((currentDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+        } else {
+            return 0;
+        }
+    }
 
 }
