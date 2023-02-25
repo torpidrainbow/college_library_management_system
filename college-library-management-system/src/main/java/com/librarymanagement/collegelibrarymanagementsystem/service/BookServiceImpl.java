@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -62,26 +63,28 @@ public class BookServiceImpl implements BookService{
             if(!user.isActive()){
                 throw new LibraryException("Cannot perform action for deactivated user");
             }
-            if (user.getType() == LIBRARIAN) {
-                Book bookEntity = new Book();
-                bookEntity.setTitle(book.getTitle());
-                bookEntity.setPublication(book.getPublication());
-                bookEntity.setAuthor(book.getAuthor());
-                bookEntity.setCategory(book.getCategory());
-                bookRepository.save(bookEntity);
-                return ("Book added");
-            }
-            else{
+            if (user.getType() != LIBRARIAN) {
                 throw new LibraryException("Only librarian can add book");
             }
+            Book bookEntity = new Book();
+            bookEntity.setTitle(book.getTitle());
+            bookEntity.setPublication(book.getPublication());
+            bookEntity.setAuthor(book.getAuthor());
+            bookEntity.setCategory(book.getCategory());
+            bookRepository.save(bookEntity);
+            return ("Book added");
         }
         catch (LibraryException e){
             throw e;
         }
         catch (DataIntegrityViolationException e){
+            throw new LibraryException("");
+        }
+        catch (ConstraintViolationException e){
             throw new LibraryException("fields can't be empty");
         }
         catch(Exception e){
+            e.printStackTrace();
             throw new Exception("Cannot add book");
         }
     }
@@ -296,10 +299,7 @@ public class BookServiceImpl implements BookService{
         }
     }
 
-    public int calculateFine(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
-        return Math.max(0, book.daysOverdue() * 5);
-    }
+
 
     @Override
     public List<Book> findOverdueBooks() {
@@ -317,6 +317,11 @@ public class BookServiceImpl implements BookService{
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         localDate = localDate.plusDays(days);
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public int calculateFine(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
+        return Math.max(0, book.daysOverdue() * 5);
     }
 
 

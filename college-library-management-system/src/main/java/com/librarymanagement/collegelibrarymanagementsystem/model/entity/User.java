@@ -5,6 +5,8 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -14,12 +16,21 @@ public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
 
+    @NotNull
+    @NotEmpty
     private String name;
 
+    @NotNull
+    @NotEmpty
+    @Column(unique = true)
     private String username;
 
+    @NotNull
+    @NotEmpty
     private String password;
 
+    @NotNull
+    @NotEmpty
     @Enumerated(EnumType.STRING)
     private User_Type type;
 

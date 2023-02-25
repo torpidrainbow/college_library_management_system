@@ -8,6 +8,7 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.repository.Rec
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.UserRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,9 @@ public class UserServiceImpl implements UserService {
                 userEntity.setTime_period(30);
             }
             userRepository.save(userEntity);
+        }
+        catch (DataIntegrityViolationException e){
+            throw new LibraryException("Username should be unique and cannot be null");
         }
         catch (Exception e){
             e.printStackTrace();

@@ -5,10 +5,9 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_cate
 import lombok.Data;
 
 import javax.persistence.*;
-
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+
 import java.util.*;
 
 
@@ -18,20 +17,27 @@ import java.util.*;
 public class Book {
 
     @Id
-    @GeneratedValue
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookid;
 
+    @NotNull
+    @NotEmpty
     private String title;
 
     @ManyToOne
     @JoinColumn(name = "userid")
     private User borrower;
 
+    @NotNull
+    @NotEmpty
     private String author;
 
+    @NotNull
+    @NotEmpty
     private String publication;
 
+    @NotNull
+    @NotEmpty
     @Enumerated(EnumType.STRING)
     private Book_category category;
 

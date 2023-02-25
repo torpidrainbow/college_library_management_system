@@ -83,10 +83,10 @@ public class UserController {
             return new ResponseEntity<>(userService.deactivateUser(userDetails.getUsername(), userId), HttpStatus.OK);
         }
 
-    @GetMapping("/modify-time")
+    @GetMapping("/modifyperiod")
     public ResponseEntity<?> modifyTimePeriod(@AuthenticationPrincipal UserDetails userDetails,Long userId) throws Exception{
 
-            return new ResponseEntity<>("",HttpStatus.OK);
+            return new ResponseEntity<>("Time period for the user is updated",HttpStatus.OK);
         }
 
 }

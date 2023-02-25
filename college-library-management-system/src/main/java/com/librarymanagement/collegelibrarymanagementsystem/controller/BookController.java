@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -43,7 +44,7 @@ public class BookController {
 
     @PostMapping("/addBook")
     @Secured(User_Type.Constants.LIBRARIAN_VALUE)
-    public ResponseEntity<String> addBook(@RequestBody BookDto bookDto,@AuthenticationPrincipal UserDetails userDetails) throws Exception {
+    public ResponseEntity<String> addBook(@Valid @RequestBody BookDto bookDto, @AuthenticationPrincipal UserDetails userDetails) throws Exception {
             return new ResponseEntity<>(bookService.addBook(userDetails.getUsername(), bookDto), HttpStatus.OK);
         }
 
@@ -55,22 +56,22 @@ public class BookController {
     }
 
     @GetMapping("/title")
-    public ResponseEntity<List<BookDto>> searchBooksByTitle(@RequestParam String title) throws Exception {
+    public ResponseEntity<List<BookDto>> searchBooksByTitle(@Valid @RequestParam String title) throws Exception {
         return new ResponseEntity<>(bookService.searchBooksByTitle(title), HttpStatus.OK);
     }
 
     @GetMapping("/author")
-    public ResponseEntity<List<BookDto>> searchBooksByAuthor(@RequestParam String author) throws Exception {
+    public ResponseEntity<List<BookDto>> searchBooksByAuthor(@Valid @RequestParam String author) throws Exception {
         return new ResponseEntity<>(bookService.searchBooksByAuthor(author),HttpStatus.OK) ;
     }
 
     @GetMapping("/publication")
-    public ResponseEntity<List<BookDto>> searchBooksByPublication(@RequestParam String publication) {
+    public ResponseEntity<List<BookDto>> searchBooksByPublication(@Valid @RequestParam String publication) {
         return new ResponseEntity<>(bookService.searchBooksByPublication(publication), HttpStatus.OK);
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<BookDto>> searchBooksByCategory(@RequestParam String category) {
+    public ResponseEntity<List<BookDto>> searchBooksByCategory(@Valid @RequestParam String category) {
             return new ResponseEntity<>(bookService.searchBooksByCategory(category), HttpStatus.OK);
     }
 
