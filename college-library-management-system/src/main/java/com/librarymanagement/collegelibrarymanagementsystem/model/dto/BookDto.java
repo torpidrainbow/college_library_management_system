@@ -20,4 +20,7 @@ public class BookDto {
     private String publication;
 
     private Book_category category;
+
+    public BookDto(String title, String author, String publication, Book_category category) {
+    }
 }

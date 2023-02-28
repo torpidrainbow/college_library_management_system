@@ -13,11 +13,8 @@ spring:
         hibernate.format_sql: true
       hibernate:
         naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        ddl-auto: update
+        ddl-auto: create
         check_nullability: true
 server:
   port : 8082
-#  servlet:
-#      session:
-#        cookie:
-#          http-only: false
+

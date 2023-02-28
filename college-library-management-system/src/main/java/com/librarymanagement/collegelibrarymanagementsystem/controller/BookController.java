@@ -6,6 +6,7 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.dto.BookDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.UserDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Book;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.BookRepository;
+import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_category;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import com.librarymanagement.collegelibrarymanagementsystem.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class BookController {
     @PostMapping("/addBook")
     @Secured(User_Type.Constants.LIBRARIAN_VALUE)
     public ResponseEntity<String> addBook(@Valid @RequestBody BookDto bookDto, @AuthenticationPrincipal UserDetails userDetails) throws Exception {
+        System.out.println(userDetails.getAuthorities());
             return new ResponseEntity<>(bookService.addBook(userDetails.getUsername(), bookDto), HttpStatus.OK);
         }
 
@@ -71,7 +73,7 @@ public class BookController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<BookDto>> searchBooksByCategory(@Valid @RequestParam String category) {
+    public ResponseEntity<List<BookDto>> searchBooksByCategory(@Valid @RequestParam Book_category category) {
             return new ResponseEntity<>(bookService.searchBooksByCategory(category), HttpStatus.OK);
     }
 

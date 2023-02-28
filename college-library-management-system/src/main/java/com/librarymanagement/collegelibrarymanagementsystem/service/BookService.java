@@ -5,6 +5,7 @@ import com.librarymanagement.collegelibrarymanagementsystem.exception.LibraryExc
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.BookDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.UserDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Book;
+import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_category;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface BookService {
 
     public List<BookDto> searchBooksByAuthor(String author) throws Exception;
 
-    List<BookDto> searchBooksByCategory(String category);
+    List<BookDto> searchBooksByCategory(Book_category category);
 
     //public void reserveBook(BookDto book) throws Exception;
 

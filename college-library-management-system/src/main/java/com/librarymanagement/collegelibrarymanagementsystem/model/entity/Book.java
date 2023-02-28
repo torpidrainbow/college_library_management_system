@@ -5,8 +5,6 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_cate
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import java.util.*;
 
@@ -20,30 +18,25 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookid;
 
-    @NotNull
-    @NotEmpty
     private String title;
 
     @ManyToOne
     @JoinColumn(name = "userid")
     private User borrower;
 
-    @NotNull
-    @NotEmpty
     private String author;
 
-    @NotNull
-    @NotEmpty
     private String publication;
 
-    @NotNull
-    @NotEmpty
     @Enumerated(EnumType.STRING)
     private Book_category category;
 
     @Column(nullable=false)
     private boolean isAvailable = Boolean.TRUE;
 
+    public Book() {
+
+    }
     public boolean isAvailable(){
         return isAvailable;
     }
@@ -54,20 +47,7 @@ public class Book {
     @Temporal(TemporalType.DATE)
     private Date dueDate;
 
-    @Temporal(TemporalType.DATE)
-    private Date return_date;
-
-    public Date getRenewalDate() {
-        return renewalDate;
-    }
-
-    public void setRenewalDate(Date renewalDate) {
-        this.renewalDate = renewalDate;
-    }
-
     private Date renewalDate;
-
-
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
@@ -96,6 +76,13 @@ public class Book {
         } else {
             return 0;
         }
+    }
+
+    public Book(String title, String author, String publisher,Book_category category) {
+        this.title = title;
+        this.author = author;
+        this.publication = publisher;
+        this.category = category;
     }
 
 }

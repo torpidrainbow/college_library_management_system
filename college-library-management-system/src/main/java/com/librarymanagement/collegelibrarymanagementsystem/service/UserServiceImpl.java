@@ -4,17 +4,15 @@ import com.librarymanagement.collegelibrarymanagementsystem.exception.LibraryExc
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.UserDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Record;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.User;
+import com.librarymanagement.collegelibrarymanagementsystem.model.repository.BookRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.RecordRespository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.UserRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 
 import static com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type.LIBRARIAN;
 
@@ -30,8 +28,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
-    public void register(UserDto userDto) throws Exception {
+    public String register(UserDto userDto) throws Exception {
         try {
             User userEntity = new User();
             Record record = new Record();
@@ -49,6 +51,7 @@ public class UserServiceImpl implements UserService {
                 userEntity.setTime_period(30);
             }
             userRepository.save(userEntity);
+            return "User Registered";
         }
         catch (DataIntegrityViolationException e){
             throw new LibraryException("Username should be unique and cannot be null");
@@ -101,9 +104,32 @@ public class UserServiceImpl implements UserService {
             throw new Exception("Cannot deactivate user");
         }
     }
+
+    @Override
+    public String modifyTimePeriod(String username, Long userId, int days) throws Exception {
+        try {
+            User loggedInUser = userRepository.findByUsername(username);
+            User user = userRepository.findById(userId).orElseThrow(() -> new LibraryException("User not found"));
+
+            if (loggedInUser.getType() != LIBRARIAN) {
+                throw new LibraryException("Only librarian can modify time period");
+            }
+            if (!user.isActive()) {
+                throw new LibraryException("User is not active");
+            }
+            user.setTime_period(days);
+            return ("Borrow period modified");
+        } catch (LibraryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("Cannot modify time period");
+        }
     }
 
-//    @Override
-//    public double totalFine(Long userId)
+    @Override
+    public double total_fine(String username) throws Exception{
+        User loggedInUser = userRepository.findByUsername(username);
 
-
+        return loggedInUser.getRecord().getFine_amount();
+    }
+}

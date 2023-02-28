@@ -1,6 +1,8 @@
 package com.librarymanagement.collegelibrarymanagementsystem.model.repository;
 
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Book;
+import com.librarymanagement.collegelibrarymanagementsystem.model.entity.User;
+import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,15 +14,13 @@ import java.util.Set;
 @Repository
 public interface BookRepository extends JpaRepository<Book,Long> {
 
-    @Query(value = "Select * from books b where b.title=?", nativeQuery = true)
-    public List<Book> findByTitle(@Param("title") String title);
+    List<Book> findByTitle(String title);
 
-    @Query(value = "Select * from books b where b.author=?", nativeQuery = true)
-    public List<Book> findByAuthor(@Param("author") String author);
+    List<Book> findByCategory(Book_category category);
 
-    @Query(value = "Select * from books b where b.publication=?", nativeQuery = true)
-    public List<Book> findByPublication(@Param("publication") String publication);
+    List<Book> findByAuthor(String author);
 
-    @Query(value = "Select * from books b where b.category=?", nativeQuery = true)
-    public List<Book> findByCategory(@Param("category") String category);
+    List<Book> findByPublication(String publication);
+
+
 }

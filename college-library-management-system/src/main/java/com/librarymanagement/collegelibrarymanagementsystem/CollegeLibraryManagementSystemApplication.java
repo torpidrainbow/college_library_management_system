@@ -11,12 +11,11 @@ public class CollegeLibraryManagementSystemApplication {
 
 	@Bean
 	public ModelMapper modelMapper() {
-		ModelMapper mapper = new ModelMapper();
 
-		mapper.getConfiguration()
-				.setMatchingStrategy(MatchingStrategies.STANDARD);
+//		mapper.getConfiguration()
+//				.setMatchingStrategy(MatchingStrategies.STANDARD);
 
-		return mapper;
+		return new ModelMapper();
 	}
 
 	public static void main(String[] args) {
