@@ -164,6 +164,10 @@ public class BookServiceImpl implements BookService{
         try {
             User user = userRepository.findByUsername(username);
             Book book = bookRepository.findById(bookId).orElseThrow(()-> new LibraryException("Book not found"));
+            
+             if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
+            }
 
             Record record = user.getRecord();
 
@@ -250,6 +254,9 @@ public class BookServiceImpl implements BookService{
         try {
             User user = userRepository.findByUsername(username);
             Book book = bookRepository.findById(bookId).orElse(null);
+             if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
+            }
 
             if (user == null || book == null) {
                 throw new LibraryException("Enter valid user and book details");
@@ -276,6 +283,10 @@ public class BookServiceImpl implements BookService{
     public String renewBook(String username,Long bookId) throws Exception {
         try {
             User user = userRepository.findByUsername(username);
+            
+             if(!user.isActive()){
+                throw new LibraryException("Cannot perform action for deactivated user");
+            }
 
             Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
             if (book.isAvailable()) {
