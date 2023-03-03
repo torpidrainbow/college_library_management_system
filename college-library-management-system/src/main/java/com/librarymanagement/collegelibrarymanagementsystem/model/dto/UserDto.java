@@ -22,7 +22,4 @@ public class UserDto {
         this.type = type;
 
     }
-    public UserDto(){
-
-    }
 }

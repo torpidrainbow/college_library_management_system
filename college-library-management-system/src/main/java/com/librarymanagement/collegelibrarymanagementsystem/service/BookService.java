@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface BookService {
 
-    List<Book> findAllBooks();
+    List<BookDto> findAllBooks();
 
     public String addBook(String username,BookDto book) throws Exception;
 

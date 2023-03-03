@@ -7,7 +7,6 @@ public interface UserService {
 
     public String register(UserDto userDto) throws Exception;
 
-
     public String deactivateUser(String username, Long userId) throws Exception;
 
     String modifyTimePeriod(String username, Long userId, int days) throws Exception;

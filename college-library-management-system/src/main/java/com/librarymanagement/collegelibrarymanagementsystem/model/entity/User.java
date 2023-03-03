@@ -29,14 +29,12 @@ public class User{
     @Enumerated(EnumType.STRING)
     private User_Type type;
 
-
-
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     Record record ;
 
 
     @OneToMany(mappedBy = "borrower",fetch = FetchType.LAZY)
-    List<Book> bookList ;
+    List<Book> bookList;
 
     public User() {
     }

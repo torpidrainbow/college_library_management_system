@@ -41,15 +41,13 @@ public class Book {
         return isAvailable;
     }
 
-    @Temporal(TemporalType.DATE)
     private Date issue_date;
 
-    @Temporal(TemporalType.DATE)
     private Date dueDate;
 
     private Date renewalDate;
 
-    @JsonIgnore
+
     @OneToMany(fetch = FetchType.LAZY)
             @JoinTable(name = "book_waiting_list",
     joinColumns = @JoinColumn(name = "bookId"),

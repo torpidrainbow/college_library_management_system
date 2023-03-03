@@ -22,5 +22,12 @@ public class BookDto {
     private Book_category category;
 
     public BookDto(String title, String author, String publication, Book_category category) {
+        this.title = title;
+        this.author = author;
+        this.publication = publication;
+        this.category = category;
+    }
+    public BookDto() {
+
     }
 }

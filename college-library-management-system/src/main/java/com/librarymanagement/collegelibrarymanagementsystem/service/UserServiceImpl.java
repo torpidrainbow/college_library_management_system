@@ -4,11 +4,9 @@ import com.librarymanagement.collegelibrarymanagementsystem.exception.LibraryExc
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.UserDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Record;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.User;
-import com.librarymanagement.collegelibrarymanagementsystem.model.repository.BookRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.RecordRespository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.UserRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,21 +60,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
-//    @Override
-//    public User authenticate(String username, String password){
-//
-//        User user = userRepository.findByUsername(username);
-//        System.out.println(user);
-//        if(user==null){
-//            return null;
-//        }
-//        boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
-//        if(!passwordMatch){
-//            return null;
-//        }
-//        return user;
-//    }
 
     @Override
     public String deactivateUser(String username, Long userId) throws Exception {

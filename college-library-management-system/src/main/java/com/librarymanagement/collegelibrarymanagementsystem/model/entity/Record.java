@@ -19,10 +19,6 @@ public class Record{
 
     private Integer books_issued=0;
 
-    private Integer books_reserved=0;
-
-    private Integer books_returned=0;
-
     private double fine_amount=0;
 
 }

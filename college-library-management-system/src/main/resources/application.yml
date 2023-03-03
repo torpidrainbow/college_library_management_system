@@ -4,7 +4,6 @@ spring:
      url: "jdbc:postgresql://localhost:5433/library_management_system"
      username: "postgres"
      password: "root"
-     continue-on-error: true
 
    jpa:
       show-sql: false

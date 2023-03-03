@@ -21,7 +21,6 @@ import java.util.Optional;
 import static com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type.LIBRARIAN;
 import static com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type.STUDENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -57,7 +56,6 @@ public class UserServiceUnitTest {
         User user2 = TestObjectFactory.UserFactory.getUser("name","student","password1",User_Type.STUDENT);
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         user2.setType(STUDENT);
-        System.out.println(user2.getType());
 
 
         assertEquals("User deactivated", userService.deactivateUser("librarian", 2L));
