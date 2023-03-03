@@ -166,7 +166,6 @@ public class BookServiceImpl implements BookService{
             Book book = bookRepository.findById(bookId).orElseThrow(()-> new LibraryException("Book not found"));
 
             Record record = user.getRecord();
-            System.out.println(record.getBooks_issued());
 
             if(user.getType()==STUDENT && record.getBooks_issued() >= 2){
 
@@ -210,7 +209,6 @@ public class BookServiceImpl implements BookService{
     public String returnBook(String username, Long bookId) throws JsonProcessingException ,LibraryException{
         try {
             User user = userRepository.findByUsername(username);
-            System.out.println(user);
             Book book = bookRepository.findById(bookId).orElseThrow(()->new LibraryException("Book not found"));
 
             if(!user.isActive()){
