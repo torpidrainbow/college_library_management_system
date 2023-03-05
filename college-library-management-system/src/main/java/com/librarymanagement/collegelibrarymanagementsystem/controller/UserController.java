@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 
 
 @Controller
@@ -40,13 +41,12 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDto userDto) throws Exception {
-
+    public ResponseEntity<String> register(@Valid @RequestBody UserDto userDto) throws Exception {
         return new ResponseEntity<>(userService.register(userDto),HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDto userDto) throws Exception {
+    public ResponseEntity<String> login(@Valid@RequestBody UserDto userDto) throws Exception {
         try {
             SecurityContextHolder.clearContext();
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(),userDto.getPassword()));

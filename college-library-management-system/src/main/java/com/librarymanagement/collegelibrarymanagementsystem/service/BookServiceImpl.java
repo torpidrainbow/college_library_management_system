@@ -1,6 +1,5 @@
 package com.librarymanagement.collegelibrarymanagementsystem.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.librarymanagement.collegelibrarymanagementsystem.exception.LibraryException;
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.BookDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Book;
@@ -10,12 +9,10 @@ import com.librarymanagement.collegelibrarymanagementsystem.model.repository.Boo
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.RecordRespository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.UserRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_category;
-import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -48,7 +45,7 @@ public class BookServiceImpl implements BookService{
 
 
     @Override
-    public List<BookDto> findAllBooks() {
+    public List<BookDto> findAllBooks() throws LibraryException{
         List<Book> bookList = bookRepository.findAll();
         if(bookList.isEmpty()){
             throw new LibraryException("Cannot find book with this keyword");
@@ -58,7 +55,7 @@ public class BookServiceImpl implements BookService{
 
 
     @Override
-    public String addBook(String username, BookDto book) throws Exception {
+    public String addBook(String username, BookDto book) throws LibraryException {
         try {
             User user = userRepository.findByUsername(username);
             if(user==null){
@@ -81,17 +78,13 @@ public class BookServiceImpl implements BookService{
         catch (LibraryException e){
             throw e;
         }
-        catch (ConstraintViolationException e){
-            throw new LibraryException("Invalid details");
-        }
         catch(Exception e){
-            e.printStackTrace();
-            throw new Exception("Cannot add book");
+            throw new LibraryException("Cannot add book");
         }
     }
 
     @Override
-    public String removeBook(String username,Long bookId) throws Exception {
+    public String removeBook(String username,Long bookId) throws LibraryException {
         try {
             User user = userRepository.findByUsername(username);
             if(user==null){
@@ -114,11 +107,11 @@ public class BookServiceImpl implements BookService{
             throw e;
         }
         catch (Exception e){
-            throw new Exception("cannot remove book");
+            throw new LibraryException("cannot remove book");
         }
     }
     @Override
-    public List<BookDto> searchBooksByTitle(String title) throws Exception {
+    public List<BookDto> searchBooksByTitle(String title) throws LibraryException {
         List<Book> bookList = bookRepository.findByTitle(title);
         if(bookList.isEmpty()){
             throw new LibraryException("Cannot find book with this keyword");
@@ -127,7 +120,7 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public List<BookDto> searchBooksByPublication(String publication) {
+    public List<BookDto> searchBooksByPublication(String publication) throws LibraryException {
         List<Book> bookList = bookRepository.findByPublication(publication);
         if(bookList.isEmpty()){
             throw new LibraryException("Cannot find book with this keyword");
@@ -136,7 +129,7 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public List<BookDto>searchBooksByAuthor(String author) throws Exception {
+    public List<BookDto>searchBooksByAuthor(String author) throws LibraryException {
         try{
             List<Book> bookList = bookRepository.findByAuthor(author);
             if(bookList.isEmpty()){
@@ -150,7 +143,7 @@ public class BookServiceImpl implements BookService{
 
     }
     @Override
-    public List<BookDto> searchBooksByCategory(Book_category category){
+    public List<BookDto> searchBooksByCategory(Book_category category) throws LibraryException{
         List<Book> bookList = bookRepository.findByCategory(category);
 
         if(bookList.isEmpty()){
@@ -198,19 +191,18 @@ public class BookServiceImpl implements BookService{
             bookRepository.save(book);
             userRepository.save(user);
 
-            return "Book issued";
+            return ("Book issued");
         }
         catch(LibraryException e){
             throw e;
         }catch (Exception e) {
-            e.printStackTrace();
             throw new LibraryException("Cannot issue book");
         }
 
     }
 
     @Override
-    public String returnBook(String username, Long bookId) throws JsonProcessingException ,LibraryException{
+    public String returnBook(String username, Long bookId) throws LibraryException{
         try {
             User user = userRepository.findByUsername(username);
             Book book = bookRepository.findById(bookId).orElseThrow(()->new LibraryException("Book not found"));
@@ -250,16 +242,12 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public String reserveBook(String username, Long bookId) throws Exception {
+    public String reserveBook(String username, Long bookId) throws LibraryException {
         try {
             User user = userRepository.findByUsername(username);
-            Book book = bookRepository.findById(bookId).orElse(null);
+            Book book = bookRepository.findById(bookId).orElseThrow(() -> new LibraryException("Book not found"));
              if(!user.isActive()){
                 throw new LibraryException("Cannot perform action for deactivated user");
-            }
-
-            if (user == null || book == null) {
-                throw new LibraryException("Enter valid user and book details");
             }
             if (book.isAvailable()) {
                 issueBook(user.getUsername(), bookId);
@@ -280,7 +268,7 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public String renewBook(String username,Long bookId) throws Exception {
+    public String renewBook(String username,Long bookId) throws LibraryException {
         try {
             User user = userRepository.findByUsername(username);
             
@@ -309,8 +297,7 @@ public class BookServiceImpl implements BookService{
             throw e;
         }
         catch (Exception e){
-            e.printStackTrace();
-            throw new Exception("Cannot renew Book");
+            throw new LibraryException("Cannot renew Book");
         }
     }
 

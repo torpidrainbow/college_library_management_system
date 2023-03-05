@@ -61,6 +61,7 @@ public class BookRepositoryTest {
         List<Book> bookList = bookRepository.findByPublication("publisher1");
 
         Assertions.assertEquals(1,bookRepository.findByPublication("publisher1").size());
+        Assertions.assertEquals(0,bookRepository.findByPublication("publisher5").size());
         Assertions.assertEquals("publisher1", bookList.stream().findFirst().get().getPublication());
 
     }

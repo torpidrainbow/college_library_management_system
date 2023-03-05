@@ -1,15 +1,10 @@
 package com.librarymanagement.collegelibrarymanagementsystem.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @Entity
@@ -19,13 +14,16 @@ public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userid;
 
+    @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(nullable = false ,unique = true)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private User_Type type;
 

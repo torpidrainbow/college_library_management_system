@@ -1,6 +1,5 @@
 package com.librarymanagement.collegelibrarymanagementsystem.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.Book_category;
 import lombok.Data;
 
@@ -18,16 +17,20 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookid;
 
+    @Column(nullable = false)
     private String title;
 
     @ManyToOne
     @JoinColumn(name = "userid")
     private User borrower;
 
+    @Column(nullable = false)
     private String author;
 
+    @Column(nullable = false)
     private String publication;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Book_category category;
 
@@ -70,7 +73,7 @@ public class Book {
     public int daysOverdue() {
         Date currentDate = new Date();
         if (currentDate.after(dueDate)) {
-            return (int) ((currentDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+            return (int) ((currentDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
         } else {
             return 0;
         }

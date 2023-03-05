@@ -4,7 +4,6 @@ import com.librarymanagement.collegelibrarymanagementsystem.exception.LibraryExc
 import com.librarymanagement.collegelibrarymanagementsystem.model.dto.UserDto;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.Record;
 import com.librarymanagement.collegelibrarymanagementsystem.model.entity.User;
-import com.librarymanagement.collegelibrarymanagementsystem.model.repository.RecordRespository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.repository.UserRepository;
 import com.librarymanagement.collegelibrarymanagementsystem.model.type.User_Type;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private RecordRespository recordRespository;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository) {
@@ -31,7 +27,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String register(UserDto userDto) throws Exception {
+    public String register(UserDto userDto) throws LibraryException {
         try {
             User userEntity = new User();
             Record record = new Record();
@@ -55,14 +51,13 @@ public class UserServiceImpl implements UserService {
             throw new LibraryException("Username should be unique and cannot be null");
         }
         catch (Exception e){
-            e.printStackTrace();
-            throw new Exception("Cannot register user");
+            throw new LibraryException("Cannot register user");
         }
     }
 
 
     @Override
-    public String deactivateUser(String username, Long userId) throws Exception {
+    public String deactivateUser(String username, Long userId) throws LibraryException {
         try {
             User loggedInUser = userRepository.findByUsername(username);
             User user = userRepository.findById(userId).orElseThrow(() -> new LibraryException("User not found"));
@@ -84,12 +79,12 @@ public class UserServiceImpl implements UserService {
         throw e;
     }
         catch (Exception e){
-            throw new Exception("Cannot deactivate user");
+            throw new LibraryException("Cannot deactivate user");
         }
     }
 
     @Override
-    public String modifyTimePeriod(String username, Long userId, int days) throws Exception {
+    public String modifyTimePeriod(String username, Long userId, int days) throws LibraryException {
         try {
             User loggedInUser = userRepository.findByUsername(username);
             User user = userRepository.findById(userId).orElseThrow(() -> new LibraryException("User not found"));
@@ -105,12 +100,12 @@ public class UserServiceImpl implements UserService {
         } catch (LibraryException e) {
             throw e;
         } catch (Exception e) {
-            throw new Exception("Cannot modify time period");
+            throw new LibraryException("Cannot modify time period");
         }
     }
 
     @Override
-    public double total_fine(String username) throws Exception{
+    public double total_fine(String username) throws LibraryException{
         User loggedInUser = userRepository.findByUsername(username);
 
         return loggedInUser.getRecord().getFine_amount();
